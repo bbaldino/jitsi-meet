@@ -40,6 +40,13 @@ var config = {
     // BOSH URL. FIXME: use XEP-0156 to discover it.
     bosh: '//jitsi-meet.example.com/http-bind',
 
+    // XMPP username to use when joining the muc.
+    // xmppUsernameOverride: '',
+
+    // XMPP password to use when joining the muc
+    // xmppPasswordOverride: '',
+
+
     // The name of client node advertised in XEP-0115 'c' stanza
     clientNode: 'http://jitsi.org/jitsimeet',
 

@@ -133,13 +133,27 @@ const commands = {
 /**
  * Open Connection. When authentication failed it shows auth dialog.
  * @param roomName the room name to use
+ * @param {object} options connection options
+ * @params {string} options.xmppUsernameOverride the username
+ * to use for the xmpp connection
+ * @params {string} options.xmppPasswordOverride the password
+ * to use for the xmpp connection
  * @returns Promise<JitsiConnection>
  */
-function connect(roomName) {
-    return openConnection({
+function connect(roomName, options) {
+    const connectionOptions = {
         retry: true,
         roomName
-    })
+    };
+
+    if (options.xmppUsernameOverride) {
+        connectionOptions.id = options.xmppUsernameOverride;
+    }
+    if (options.xmppPasswordOverride) {
+        connectionOptions.password = options.xmppPasswordOverride;
+    }
+
+    return openConnection(connectionOptions)
     .catch(err => {
         if (err === JitsiConnectionErrors.PASSWORD_REQUIRED) {
             APP.UI.notifyTokenAuthFailed();
@@ -654,7 +668,21 @@ export default {
         tryCreateLocalTracks.then(() =>
             APP.store.dispatch(mediaPermissionPromptVisibilityChanged(false)));
 
-        return Promise.all([ tryCreateLocalTracks, connect(roomName) ])
+        const connectOptions = {};
+
+        if (options.xmppUsernameOverride) {
+            connectOptions.xmppUsernameOverride = options.xmppUsernameOverride;
+        }
+        if (options.xmppPasswordOverride) {
+            connectOptions.xmppPasswordOverride = options.xmppPasswordOverride;
+        }
+
+        const allPromises = [
+            tryCreateLocalTracks,
+            connect(roomName, connectOptions)
+        ];
+
+        return Promise.all(allPromises)
             .then(([ tracks, con ]) => {
                 // FIXME If there will be microphone error it will cover any
                 // screensharing dialog, but it's still better than in
@@ -730,7 +758,9 @@ export default {
                         startAudioOnly: config.startAudioOnly,
                         startScreenSharing: config.startScreenSharing,
                         startWithAudioMuted: config.startWithAudioMuted,
-                        startWithVideoMuted: config.startWithVideoMuted
+                        startWithVideoMuted: config.startWithVideoMuted,
+                        xmppUsernameOverride: config.xmppUsernameOverride,
+                        xmppPasswordOverride: config.xmppPasswordOverride
                     });
             })
             .then(([ tracks, con ]) => {

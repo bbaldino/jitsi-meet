@@ -87,7 +87,9 @@ const WHITELISTED_KEYS = [
     'useNicks',
     'useStunTurn',
     'webrtcIceTcpDisable',
-    'webrtcIceUdpDisable'
+    'webrtcIceUdpDisable',
+    'xmppPasswordOverride',
+    'xmppUsernameOverride'
 ];
 
 const logger = require('jitsi-meet-logger').getLogger(__filename);
